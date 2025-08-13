@@ -19,7 +19,7 @@ export default function Login({ onClose }) {
     e.preventDefault();
 
     try {
-      const users = JSON.parse(localStorage.getItem("user") || "[]");
+      const users = JSON.parse(localStorage.getItem("users") || "[]");
 
       const userExists = users.some((user) => user.email === email);
       if (userExists) {
@@ -27,16 +27,20 @@ export default function Login({ onClose }) {
         return;
       }
 
-      const data = { name, email, password };
-      users.push(data);
-      localStorage.setItem("user", JSON.stringify(users));
+      const newUser = { name, email, password };
+      users.push(newUser);
+
+      localStorage.setItem("users", JSON.stringify(users));
+
+      localStorage.setItem("currentUser", JSON.stringify(newUser));
+
       clearForm();
       toast.success("Registration successful!");
       onClose();
       setShowRegister(false);
-      navigate("/")
+      navigate("/");
     } catch (err) {
-      console.log(err.message);
+      console.error(err);
       toast.error("Registration failed due to an error.");
     }
   };
@@ -44,7 +48,7 @@ export default function Login({ onClose }) {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    const users = JSON.parse(localStorage.getItem("user") || "[]");
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
 
     const matchedUser = users.find(
       (user) => user.email === email && user.password === password
@@ -52,7 +56,9 @@ export default function Login({ onClose }) {
 
     if (matchedUser) {
       toast.success("Login successful! 👌");
+
       localStorage.setItem("currentUser", JSON.stringify(matchedUser));
+
       clearForm();
       onClose();
       navigate("/");

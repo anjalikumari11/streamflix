@@ -7,16 +7,21 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import DetailPage from './components/DetailPage';
 import Movies from './pages/Movies';
 import Login from './pages/admin/Login';
-import { ToastContainer } from 'react-bootstrap';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import ProtectedRoutes from './ProtectedRoutes/ProtectedRoutes';
 import SearchResults from './components/SearchResults';
 import PlayTrailer from './components/PlaytTrailer';
+import Favorites from './pages/Favorites';
 function App() {
   return (
     <Router>
       <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/favorites" element={<ProtectedRoutes>
+          <Favorites />
+        </ProtectedRoutes>} />
         <Route path="/details/:type/:id" element={<ProtectedRoutes>
           <DetailPage />
         </ProtectedRoutes>} />

@@ -32,14 +32,14 @@ function Navbar() {
     setShowLoginModal(true);
   };
   useEffect(() => {
-    const admin = JSON.parse(localStorage.getItem("user"));
-    if (Array.isArray(admin) && admin.length > 0) {
-      setUser(admin[0]);
+    const current = JSON.parse(localStorage.getItem("currentUser"));
+    if (current) {
+      setUser(current);
     }
+  }, [showLoginModal]);
 
-  }, [])
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("currentUser");
     setUser(null);
     setShowLoginModal(true);
   };
@@ -58,14 +58,14 @@ function Navbar() {
 
           <div className="collapse navbar-collapse NavResLink" id="navbarNav">
             <ul className="navbar-nav me-auto">
-              {['/', '/movies'].map((path, i) => (
+              {['/', '/movies', 'favorites'].map((path, i) => (
                 <li className="nav-item" key={path}>
                   <button
                     className={`nav-link btn btn-link ${location.pathname === path ? 'text-danger' : 'text-white'}`}
                     onClick={() => navigate(path)}
                   >
                     {i === 0 ? <FontAwesomeIcon icon={faHome} className="me-2" /> : null}
-                    {['Home', 'Movies'][i]}
+                    {['Home', 'Movies', 'Favorites'][i]}
                   </button>
                 </li>
               ))}
@@ -82,7 +82,7 @@ function Navbar() {
                   data-bs-toggle="dropdown"
                 >
                   {user ? (
-                    user.name.charAt(0).toUpperCase() + user.name.slice(1).toLowerCase() 
+                    user.name.charAt(0).toUpperCase() + user.name.slice(1).toLowerCase()
                   ) : 'Sign In'}
                 </button>
                 <ul className="dropdown-menu dropdown-menu-end bg-dark">

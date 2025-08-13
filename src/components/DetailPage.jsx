@@ -14,7 +14,7 @@ const DetailPage = () => {
     const [item, setItem] = useState(null);
     const [similarItems, setSimilarItems] = useState([]);
     const [loading, setLoading] = useState(true);
-   
+
 
     useEffect(() => {
         const loadDetails = async () => {
@@ -71,7 +71,18 @@ const DetailPage = () => {
     const poster = tmdbService.getImageUrl(item.poster_path, 'w500');
     const backdrop = tmdbService.getBackdropUrl(item.backdrop_path, 'original');
 
-   
+    const addToFav = (favItem) => {
+        const getFavMovies = JSON.parse(localStorage.getItem("MyFav") || "[]");
+        const alreadyExists = getFavMovies.some(mov => mov.id === favItem.id);
+        if (alreadyExists) {
+            toast.warn("Already in Favorites");
+        } else {
+            const updatedFavs = [...getFavMovies, favItem];
+            localStorage.setItem("MyFav", JSON.stringify(updatedFavs));
+            toast.success("Added to Favorites!");
+        }
+    };
+
     return (
         <>
             <Navbar />
@@ -99,9 +110,9 @@ const DetailPage = () => {
                                     Back
                                 </button>
 
-                                <h1 className="display-3 fw-bold" style={{ marginTop: "130px" }}>{title.length>45 ? <h2>{title}</h2> : title}</h1>
+                                <h1 className="display-3 fw-bold" style={{ marginTop: "130px" }}>{title.length > 45 ? <h2>{title}</h2> : title}</h1>
 
-                                <p className="mb-3">{(item.overview?.slice(0,250) + "...")}</p>
+                                <p className="mb-3">{(item.overview?.slice(0, 250) + "...")}</p>
 
                                 <div className="mb-3">
                                     {year && (
@@ -123,11 +134,11 @@ const DetailPage = () => {
                                 </p>
 
                                 <div className="d-flex gap-3">
-                                    <button className="btn btn-danger btn-lg" onClick={() =>navigate(`/movie/${id}/play`)}>
+                                    <button className="btn btn-danger btn-lg" onClick={() => navigate(`/movie/${id}/play`)}>
                                         <FontAwesomeIcon icon={faPlay} className="me-2" />
                                         Play
                                     </button>
-                                    <button className="btn btn-outline-danger btn-lg">
+                                    <button className="btn btn-outline-danger btn-lg" onClick={() => addToFav(item)}>
                                         <FontAwesomeIcon icon={faHeart} className="me-2" />
                                         Add to List
                                     </button>

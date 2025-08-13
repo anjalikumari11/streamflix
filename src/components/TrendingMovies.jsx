@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import './TrendingMovies.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { tmdb } from '../service/tmdb';
 import Login from '../pages/admin/Login';
+import { toast } from 'react-toastify';
 
 const CATEGORY_LABELS = {
   trending: 'Trending Movies',
@@ -55,19 +56,41 @@ function TrendingMovies() {
 
     fetchMovies();
   }, []);
-  
-  
+
+
   const handleDetailPage = (id) => {
-    const user = JSON.parse(localStorage.getItem("currentUser"));
+   const user = JSON.parse(localStorage.getItem("currentUser"));
+   
     if (!user?.name) {
       setShowLoginModal(true);
     }
-    else{
+    else {
       navigate(`/details/movie/${id}`)
     }
   }
 
-  
+  const addToFav = async (favMovId) => {
+    const getFavMovies = JSON.parse(localStorage.getItem("MyFav") || "[]");
+
+    const allMovies = [
+      ...movies.trending,
+      ...movies.nowPlaying,
+      ...movies.popular,
+      ...movies.topRated,
+      ...movies.upcoming
+    ];
+    const movieToAdd = allMovies.find(mov => mov.id === favMovId);
+    const alreadyExists = getFavMovies.some(mov => mov.id === favMovId);
+
+    if (alreadyExists) {
+      toast.warn("Already in Favorites");
+    } else {
+      const updatedFavs = [...getFavMovies, movieToAdd];
+      localStorage.setItem("MyFav", JSON.stringify(updatedFavs));
+      toast.success("Added to Favorites!");
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-vh-100 bg-dark d-flex align-items-center justify-content-center" style={{ paddingTop: '76px' }}>
@@ -81,7 +104,7 @@ function TrendingMovies() {
 
   return (
     <div className="content-row mb-2 mt-3">
-      <div className="container-fluid">
+      <div className="container">
         <div className="row">
           <div className="col-12">
             {Object.entries(movies).map(([categoryKey, movieList]) => (
@@ -99,19 +122,21 @@ function TrendingMovies() {
                         />
 
                         <div className="hover-card">
-                         
+
                           <img
                             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                             alt={movie.title || movie.name}
                             className="hover-video"
+                            onClick={()=>handleDetailPage(movie.id)}
+                            style={{cursor:"pointer"}}
                           />
 
                           <div className="hover-details">
                             <div className="hover-controls">
-                              <button className="play-btn"  onClick={() =>navigate(`/movie/${movie.id}/play`)}>▶ Play</button>
+                              <button className="play-btn" onClick={() => navigate(`/movie/${movie.id}/play`)}>▶ Play</button>
                               <span className="duration">02:16 hrs</span>
                               <div className="hover-icons">
-                                <span className="circle-icon">＋</span>
+                                <span className="circle-icon" onClick={() => addToFav(movie.id)}><FontAwesomeIcon icon={faHeart}  /></span>
                                 <span
                                   className="circle-icon"
                                   onClick={() => handleDetailPage(movie.id)}
